@@ -1,23 +1,21 @@
 export default async function handler(req, res) {
-  const ua = req.headers["user-agent"] || "";
-
-  // bloquear navegador
-  if (
-    ua.includes("Chrome") ||
-    ua.includes("Mozilla") ||
-    ua.includes("Safari")
-  ) {
-    return res.redirect("https://google.com");
-  }
-
   try {
-    const response = await fetch("https://la14hd.com/vivo/canales.php?stream=dsports");
-    const data = await response.text();
+    const url = "https://la14hd.com/vivo/canales.php?stream=dsports";
 
-    res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-    res.status(200).send(data);
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://la14hd.com/"
+      }
+    });
+
+    // 🔹 seguir redirecciones automáticamente
+    const finalUrl = response.url;
+
+    // 🔹 redirigir directamente al stream final
+    return res.redirect(finalUrl);
 
   } catch (err) {
-    res.status(500).send("Error");
+    res.status(500).send("Error proxy");
   }
 }
