@@ -1,27 +1,10 @@
 export default async function handler(req, res) {
   try {
-    const baseUrl = "https://la14hd.com";
-    const url = baseUrl + "/vivo/canales.php?stream=dsports";
+    const streamUrl = "https://c2nvdxq.fubohd.com/dsports/mono.m3u8?token=e8f3320e9239f240e345e013f1d071db8441d165-8c-1775761929-1775743929";
 
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-        "Referer": baseUrl
-      }
-    });
-
-    let data = await response.text();
-
-    // 🔹 corregir rutas relativas del m3u8
-    data = data.replace(/(?!https?:\/\/)([^\s]+)/g, (match) => {
-      if (match.startsWith("#")) return match;
-      return baseUrl + "/" + match;
-    });
-
-    res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-    res.send(data);
+    return res.redirect(streamUrl);
 
   } catch (err) {
-    res.status(500).send("Error proxy");
+    res.status(500).send("Error");
   }
 }
