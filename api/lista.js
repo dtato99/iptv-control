@@ -1,29 +1,42 @@
 export default async function handler(req, res) {
-  const ua = req.headers["user-agent"] || "";
 
-  if (
-    ua.includes("Chrome") ||
-    ua.includes("Mozilla") ||
-    ua.includes("Safari")
-  ) {
+  const REAL_URL =
+    "https://drive.google.com/uc?export=download&id=119AbosoTLjIeSlbeMjbnrVSzsuDhCM1X";
+
+  const ua = (req.headers["user-agent"] || "").toLowerCase();
+
+  // SOLO SPARKLE TV
+  const esSparkle =
+    ua.includes("sparkle") ||
+    ua.includes("sparkletv") ||
+    ua.includes("sparkle tv");
+
+  // TODO LO DEMÁS -> GOOGLE
+  if (!esSparkle) {
     return res.redirect("https://google.com");
   }
 
   try {
-    const listaUrl = "https://drive.google.com/uc?export=download&id=119AbosoTLjIeSlbeMjbnrVSzsuDhCM1X";
 
-    const response = await fetch(listaUrl);
-    let data = await response.text();
+    const response = await fetch(REAL_URL);
 
-    data = data.replace(
-      "https://la14hd.com/vivo/canales.php?stream=dsports",
-      "https://TU-APP.vercel.app/api/dsports"
+    const text = await response.text();
+
+    res.setHeader(
+      "Content-Type",
+      "audio/x-mpegurl"
     );
 
-    res.setHeader("Content-Type", "audio/x-mpegurl");
-    res.status(200).send(data);
+    res.setHeader(
+      "Cache-Control",
+      "no-store"
+    );
 
-  } catch (err) {
-    res.status(500).send("Error");
+    return res.status(200).send(text);
+
+  } catch (e) {
+
+    return res.status(500).send("Error");
+
   }
-
+}
