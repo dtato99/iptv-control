@@ -1,7 +1,8 @@
 export default async function handler(req, res) {
 
   const REAL_URL =
-    "https://drive.google.com/uc?export=download&id=119AbosoTLjIeSlbeMjbnrVSzsuDhCM1X";
+    "const REAL_URL =
+  "https://drive.google.com/uc?export=download&id=18DyvSvMy5_5E12gCjWlr3oHrEAMoFiSv";
 
   const ua = (req.headers["user-agent"] || "").toLowerCase();
 
