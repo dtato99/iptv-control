@@ -1,38 +1,55 @@
 export default async function handler(req, res) {
 
-  const REAL_URL =
-    "https://drive.google.com/uc?export=download&id=18DyvSvMy5_5E12gCjWlr3oHrEAMoFiSv";
-
   const ua = (req.headers["user-agent"] || "").toLowerCase();
 
-  // SOLO SPARKLE TV
-  const esSparkle =
+  console.log("USER AGENT:", ua);
+
+  // SOLO permitir Sparkle
+  const allow =
     ua.includes("sparkle") ||
-    ua.includes("sparkletv") ||
-    ua.includes("sparkle tv");
+    ua.includes("okhttp");
 
-  // TODO LO DEMÁS -> ERROR SILENCIOSO
-  if (!esSparkle) {
+  // Bloquear navegadores y otros players
+  const blocked =
+    ua.includes("mozilla") ||
+    ua.includes("chrome") ||
+    ua.includes("firefox") ||
+    ua.includes("vlc") ||
+    ua.includes("smarters") ||
+    ua.includes("iptv");
 
-    return res.status(404).send("Not found");
+  if (!allow || blocked) {
+    return res.status(403).send("Forbidden");
+  }
+
+  // Elegir lista
+  const lista = req.query.lista || "1";
+
+  let url = "";
+
+  // LISTA 1
+  if (lista === "1") {
+
+    url =
+      "https://drive.google.com/uc?export=download&id=1IL3ayNtVyUj7L5EbLxb7gIveGQXEConw";
+
+  }
+
+  // LISTA 2
+  if (lista === "2") {
+
+    url =
+      "https://drive.google.com/uc?export=download&id=18DyvSvMy5_5E12gCjWlr3oHrEAMoFiSv";
 
   }
 
   try {
 
-    const response = await fetch(REAL_URL);
+    const response = await fetch(url);
 
     const text = await response.text();
 
-    res.setHeader(
-      "Content-Type",
-      "audio/x-mpegurl"
-    );
-
-    res.setHeader(
-      "Cache-Control",
-      "no-store"
-    );
+    res.setHeader("Content-Type", "audio/x-mpegurl");
 
     return res.status(200).send(text);
 
