@@ -1,40 +1,49 @@
-// server.js
-const express = require("express");
-const fetch = require("node-fetch");
+export default async function handler(req, res) {
 
-const app = express();
-
-const LISTA =
-  "https://drive.google.com/uc?export=download&id=18DyvSvMy5_5E12gCjWlr3oHrEAMoFiSv";
-
-app.get("/lista", async (req, res) => {
+  // Detectar User-Agent
   const ua = (req.headers["user-agent"] || "").toLowerCase();
 
+  console.log("USER AGENT:", ua);
+
   // SOLO permitir Sparkle
-  const permitido =
+  const allow =
     ua.includes("sparkle") ||
-    ua.includes("exoplayer");
+    ua.includes("okhttp");
 
   // Bloquear navegadores y otros players
-  if (!permitido) {
-    return res.redirect("https://google.com");
+  const blocked =
+    ua.includes("mozilla") ||
+    ua.includes("chrome") ||
+    ua.includes("firefox") ||
+    ua.includes("vlc") ||
+    ua.includes("smarters") ||
+    ua.includes("iptv");
+
+  // Si NO es Sparkle -> ERROR
+  if (!allow || blocked) {
+
+    return res.status(403).send("Forbidden");
+
   }
+
+  // Lista REAL de Drive
+  const url =
+    "https://drive.google.com/uc?export=download&id=18DyvSvMy5_5E12gCjWlr3oHrEAMoFiSv";
 
   try {
-    const response = await fetch(LISTA);
 
-    const texto = await response.text();
+    const response = await fetch(url);
 
-    res.setHeader("Content-Type", "application/x-mpegURL");
-    res.send(texto);
+    const text = await response.text();
+
+    // Tipo M3U
+    res.setHeader("Content-Type", "audio/x-mpegurl");
+
+    return res.status(200).send(text);
 
   } catch (e) {
-    res.status(500).send("Error");
+
+    return res.status(500).send("Error");
+
   }
-});
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log("Servidor iniciado");
-});
+}
